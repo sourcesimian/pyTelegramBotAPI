@@ -1,0 +1,8 @@
+*.pyc
+python/.idea
+python/virtualenv
+.idea/
+.DS_Store
+.coverage
+_trial_temp*
+virtualenv/
