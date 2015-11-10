@@ -1,7 +1,6 @@
+tests/env.py
 *.pyc
-python/.idea
-python/virtualenv
-.idea/
+.idea
 .DS_Store
 .coverage
 _trial_temp*

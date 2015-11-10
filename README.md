@@ -8,6 +8,37 @@ ref: https://core.telegram.org/bots/api
 
     pip install https://github.com/sourcesimian/pyTelegramBotAPI/tarball/master#egg=TelegramBotAPI-0.1
 
+## Usage
+    from TelegramBotAPI.client.basic import BasicClient
+    from TelegramBotAPI.types.methods import sendMessage, getUpdates
+    from TelegramBotAPI.types.compound import Message, File
+
+    # setup
+    client = BasicClient(_token)
+
+
+    # send_message
+    msg = sendMessage()
+    msg.chat_id = 1234
+    msg.text = 'hello there'
+
+    client.post(msg)
+
+
+    # poll updates
+    msg = getUpdates()
+    msg.timeout = _timeout
+    msg.limit = _limit
+    msg.offset = last_id + 1
+
+    updates, last_id = client.post(msg)
+
+    for update in updates:
+        if isinstance(update, Message):
+            print update.text
+        elif isinstance(update, File):
+            url = update.download_url(_token)
+
 ## Integration
 
 You can easily add TelegramBotAPI as an install dependency of your own project, e.g.:
