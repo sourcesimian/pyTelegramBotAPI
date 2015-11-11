@@ -3,11 +3,14 @@ class TypeMeta(type):
     def __new__(mcs, name, bases, attrs):
         cls = type.__new__(mcs, name, bases, attrs)
         if '__metaclass__' not in attrs:
-            Type._Type__type_map[name.lower()] = cls
+            Type._Type__type_map[name.lower()] = cls  # pylint: disable=no-member
             from TelegramBotAPI.types.field import Field
-            fields = [n for n in dir(cls) if type(getattr(cls, n)) == Field]
-            cls._valid_fields = {n.lower(): getattr(cls, n) for n in fields}
-            [delattr(cls, n) for n in fields]
+            cls._valid_fields = {}
+            for n in dir(cls):
+                a = getattr(cls, n)
+                if isinstance(a, Field):
+                    cls._valid_fields[n.lower()] = a
+                    delattr(cls, n)
         return cls
 
 
@@ -22,7 +25,8 @@ class Type(object):
         for field in self._valid_fields.itervalues():
             field.setup_types()
         if len(args) > 1:
-            raise TypeError('%s can take up to 1 argument (%d given)' % (self.__class__.__name__, len(args)))
+            raise TypeError('%s can take up to 1 argument (%d given)' % (self.__class__.__name__,
+                                                                         len(args)))
         if args:
             self._from_raw(args[0])
 
@@ -56,14 +60,14 @@ class Type(object):
         return raw
 
     @classmethod
-    def _new(cls, value, type=None):
-        if type is None:
-            type = set(value.keys()).intersection(cls.__type_map.keys())
-            assert len(type) == 1
-            type = type.pop()
-            value = value[type]
+    def _new(cls, value, type_name=None):
+        if type_name is None:
+            type_name = set(value.keys()).intersection(cls.__type_map.keys())
+            assert len(type_name) == 1
+            type_name = type_name.pop()
+            value = value[type_name]
 
-        instance = cls.__type_map[type.lower()]()
+        instance = cls.__type_map[type_name.lower()]()
         instance._from_raw(value)
 
         return instance
@@ -139,11 +143,8 @@ class Type(object):
         for name in self._d:
             yield name
 
-    def __str__(self):
-        return str(self._to_raw(strict=False))
-
     def __repr__(self):
-        return repr(self._to_raw(strict=False))
+        return "<%s %s>" % (self.__class__.__name__, str(self._to_raw(strict=False)))
 
     def __cmp__(self, other):
         if self._leaf:
@@ -163,7 +164,7 @@ class Delegate(object):
 
 class AssignDelegate(Delegate):
     def _from_raw(self, raw):
-        if type(raw) in self._field.types:
+        if any([True for t in self._field.types if isinstance(raw, t)]):
             self._d[self._key] = raw
         else:
             self._d[self._key] = self.__from_raw(raw)
@@ -183,28 +184,29 @@ class AssignDelegate(Delegate):
 
     def __from_raw(self, raw):
         last_exception = None
-        for type in self._field.types:
+        for cls in self._field.types:
             try:
                 assert not self._field.list
-                value = type()
+                value = cls()
                 value._from_raw(raw)
                 return value
             except TypeError, e:
                 last_exception = e
-        else:
-            raise last_exception
+        raise TypeError('Field <%s> "%s" = "%s": %s' % (self._field.__class__.__name__,
+                                                        self._key,
+                                                        repr(raw),
+                                                        last_exception,))
 
     def __from_field(self, key, value):
         last_exception = None
-        for type in self._field.types:
+        for cls in self._field.types:
             try:
-                v = type()
+                v = cls()
                 setattr(v, key, value)
                 return v
             except TypeError, e:
                 last_exception = e
-        else:
-            raise last_exception
+        raise last_exception  # pylint: disable=raising-bad-type
 
 
 class ListDelegate(Delegate):

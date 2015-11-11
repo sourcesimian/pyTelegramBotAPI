@@ -8,6 +8,7 @@ from TelegramBotAPI.types.compound import Message, User, UserProfilePhotos, File
 class Method(Type):
     _response = None
 
+
 class sendMessage(Method):
     _response = Message
 

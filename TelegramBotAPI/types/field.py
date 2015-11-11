@@ -1,5 +1,3 @@
-from TelegramBotAPI.types.type import Type
-
 
 class Field(object):
     def __init__(self, *args, **kwargs):
@@ -7,12 +5,12 @@ class Field(object):
         self.list = False
 
         self.types = []
-        for type in args:
-            if isinstance(type, list):
-                type = type[0]
+        for cls in args:
+            if isinstance(cls, list):
+                cls = cls[0]
                 self.list = True
                 assert len(args) == 1  # Only allow a single type when using a list
-            self.types.append(type)
+            self.types.append(cls)
 
     def setup_types(self):
         """
@@ -21,6 +19,8 @@ class Field(object):
         replace with the real class.
         """
         def load(t):
+            from TelegramBotAPI.types.type import Type
+
             if isinstance(t, basestring):
                 return Type._type(t)
             assert issubclass(t, Type)

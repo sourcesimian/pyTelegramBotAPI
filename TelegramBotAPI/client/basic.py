@@ -32,9 +32,9 @@ class BasicClient(object):
         value = rsp.json()
 
         if value['ok'] is not True:
-            m = Error()
-            m._from_raw(value)
-            raise m
+            e = Error()
+            e._from_raw(value)
+            raise Exception("method: %s\nresponse: %s" % (method, e,))
 
         if method._response:
             m = method._response()
@@ -42,10 +42,8 @@ class BasicClient(object):
             return m
         elif isinstance(value['result'], Iterable):
             updates = []
-            update_id = None
             for result in value['result']:
-                updates.append(Type._new(result))
-                update_id = max(update_id, result['update_id'])
-            return updates, update_id
+                updates.append((result['update_id'], Type._new(result)))
+            return updates
 
         raise ValueError("Unhandled message from server: %s" % value)

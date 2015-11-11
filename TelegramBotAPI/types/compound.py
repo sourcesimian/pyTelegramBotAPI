@@ -77,7 +77,7 @@ class UserProfilePhotos(Type):
     total_count = Field(Integer)
     photos = Field([PhotoSize])
 
-    def _to_raw(self):
+    def _to_raw(self, strict=True):
         setattr(self, 'total_count', len(self._d['photos']))
         return super(UserProfilePhotos, self)._to_raw()
 
@@ -104,6 +104,7 @@ class Voice(Type):
     duration = Field(Integer)  # seconds
     mime_type = Field(String, optional=True)
     file_size = Field(Integer, optional=True)
+
 
 class Message(Type):
     message_id = Field(Integer)

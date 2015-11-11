@@ -24,7 +24,7 @@ class Boolean(Type):
 class Float(Type):
     def _from_raw(self, primitive):
         if not (isinstance(primitive, int) or isinstance(primitive, float)):
-            raise TypeError('Not a Boolean type')
+            raise TypeError('Not a Float type')
         self._d = float(primitive)
         return self._d
 
@@ -33,5 +33,5 @@ class InputFile(Type):
     def _from_raw(self, filename):
         self.__filename = filename
 
-    def _to_raw(self, *_s):
+    def _to_raw(self, *_):
         return open(self.__filename)

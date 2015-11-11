@@ -1,1 +1,3 @@
-from basic import BasicClient
+from TelegramBotAPI.client.basic import BasicClient
+
+__all__ = ['BasicClient']

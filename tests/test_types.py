@@ -5,8 +5,8 @@ from tempfile import NamedTemporaryFile
 
 from TelegramBotAPI.types.type import Type
 from TelegramBotAPI.types.primitive import Float, String, Integer, InputFile
-from TelegramBotAPI.types.compound import Message, User, Chat, ReplyKeyboardMarkup, UserProfilePhotos, ReplyKeyboardHide, Location
-from TelegramBotAPI.types.methods import sendMessage, sendAudio
+from TelegramBotAPI.types import Message, User, Chat, ReplyKeyboardMarkup, UserProfilePhotos, ReplyKeyboardHide, Location, File
+from TelegramBotAPI.types import sendMessage, sendAudio
 
 
 _message_rsp = """{"ok": true, "result": {"date": 142703037, "text": "Morning?!", "from": {"username": "botbot", "first_name": "Bot bot", "id": 10272353}, "message_id": 16, "chat": {"username": "joe_soap", "first_name": "Joe", "id": 1624712}}}"""
@@ -261,14 +261,14 @@ class Methods(TestCase):
         m = Message()
         m.date = 1234
 
-        self.assertEquals(repr({'date': 1234}), repr(m))
+        self.assertEquals("<%s %s>" % (m.__class__.__name__, repr({'date': 1234})), repr(m))
         self.assertEquals(repr(1234), repr(m.date))
 
     def test_str(self):
         m = Message()
         m.date = 1234
 
-        self.assertEquals(str({'date': 1234}), str(m))
+        self.assertEquals("<%s %s>" % (m.__class__.__name__, str({'date': 1234})), repr(m))
         d = m.date
         self.assertEquals(str(1234), str(d))
 
@@ -415,6 +415,19 @@ class Methods(TestCase):
             m.text
 
         self.assertRaises(AttributeError, g)
+
+    def test_file_url(self):
+        token = 'f4co5iuq3oidugr4iquf4lulfiu4bilabl'
+        path = 'blah/124312414.jpg'
+        exp = "https://api.telegram.org/file/bot%s/%s" % (token, path)
+
+        m = File()
+        m.file_id = 1234
+        m.file_size = 12345678
+        m.file_path = 'blah/124312414.jpg'
+
+        self.assertEqual(exp, m.download_url(token))
+
 
 if __name__ == '__main__':
     import unittest
