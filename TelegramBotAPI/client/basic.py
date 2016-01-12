@@ -36,14 +36,14 @@ class BasicClient(object):
             e._from_raw(value)
             raise Exception("method: %s\nresponse: %s" % (method, e,))
 
-        if method._response:
+        if isinstance(value['result'], list):
+            responses = []
+            for result in value['result']:
+                m = method._response()
+                m._from_raw(result)
+                responses.append(m)
+            return responses
+        else:
             m = method._response()
             m._from_raw(value['result'])
             return m
-        elif isinstance(value['result'], Iterable):
-            updates = []
-            for result in value['result']:
-                updates.append((result['update_id'], Type._new(result)))
-            return updates
-
-        raise ValueError("Unhandled message from server: %s" % value)

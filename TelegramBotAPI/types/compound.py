@@ -3,6 +3,11 @@ from TelegramBotAPI.types.field import Field
 from TelegramBotAPI.types.primitive import Integer, String, Boolean, Float
 
 
+class Update(Type):
+    update_id = Field(Integer)
+    message = Field('Message', optional=True)
+
+
 class User(Type):
     id = Field(Integer)
     first_name = Field(String)
@@ -17,6 +22,32 @@ class Chat(Type):
     username = Field(String, optional=True)
     first_name = Field(String, optional=True)
     last_name = Field(String, optional=True)
+
+
+class Message(Type):
+    message_id = Field(Integer)
+    froM = Field(User, optional=True)
+    date = Field(Integer)
+    chat = Field(User, Chat)
+    forward_from = Field(User, optional=True)
+    forward_date = Field(Integer, optional=True)
+    reply_to_message = Field('Message', optional=True)
+    text = Field(String, optional=True)
+    audio = Field('Audio', optional=True)
+    document = Field('Document', optional=True)
+    photo = Field(['PhotoSize'], optional=True)
+    sticker = Field('Sticker', optional=True)
+    video = Field('Video', optional=True)
+    voice = Field('Voice', optional=True)
+    caption = Field(String, optional=True)
+    contact = Field('Contact', optional=True)
+    location = Field('Location', optional=True)
+    new_chat_participant = Field(User, optional=True)
+    left_chat_participant = Field(User, optional=True)
+    new_chat_title = Field(String, optional=True)
+    new_chat_photo = Field(['PhotoSize'], optional=True)
+    delete_chat_photo = Field(Boolean, optional=True)
+    group_chat_created = Field(Boolean, optional=True)
 
 
 class PhotoSize(Type):
@@ -61,6 +92,13 @@ class Video(Type):
     file_size = Field(Integer, optional=True)
 
 
+class Voice(Type):
+    file_id = Field(String)
+    duration = Field(Integer)  # seconds
+    mime_type = Field(String, optional=True)
+    file_size = Field(Integer, optional=True)
+
+
 class Contact(Type):
     phone_number = Field(String)
     first_name = Field(String)
@@ -97,44 +135,6 @@ class ReplyKeyboardHide(Type):
 class ForceReply(Type):
     force_reply = Field(Boolean)
     selective = Field(Boolean, optional=True)
-
-
-class Voice(Type):
-    file_id = Field(String)
-    duration = Field(Integer)  # seconds
-    mime_type = Field(String, optional=True)
-    file_size = Field(Integer, optional=True)
-
-
-class Message(Type):
-    message_id = Field(Integer)
-    froM = Field(User)
-    date = Field(Integer)
-    chat = Field(User, Chat)
-    forward_from = Field(User, optional=True)
-    forward_date = Field(Integer, optional=True)
-    reply_to_message = Field('Message', optional=True)
-    text = Field(String, optional=True)
-    audio = Field(Audio, optional=True)
-    document = Field(Document, optional=True)
-    photo = Field([PhotoSize], optional=True)
-    sticker = Field(Sticker, optional=True)
-    video = Field(Video, optional=True)
-    voice = Field(Voice, optional=True)
-    caption = Field(String, optional=True)
-    contact = Field(Contact, optional=True)
-    location = Field(Location, optional=True)
-    new_chat_participant = Field(User, optional=True)
-    left_chat_participant = Field(User, optional=True)
-    new_chat_title = Field(String, optional=True)
-    new_chat_photo = Field([PhotoSize], optional=True)
-    delete_chat_photo = Field(Boolean, optional=True)
-    group_chat_created = Field(Boolean, optional=True)
-
-
-class Update(Type):
-    update_id = Field(Integer)
-    message = Field(Message, optional=True)
 
 
 class File(Type):

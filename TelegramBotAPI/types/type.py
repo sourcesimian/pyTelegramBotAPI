@@ -192,10 +192,8 @@ class AssignDelegate(Delegate):
                 return value
             except TypeError, e:
                 last_exception = e
-        raise TypeError('Field <%s> "%s" = "%s": %s' % (self._field.__class__.__name__,
-                                                        self._key,
-                                                        repr(raw),
-                                                        last_exception,))
+        raise TypeError('%s "%s" = "%s": %s' % (self._field, self._key,
+                                                repr(raw), last_exception,))
 
     def __from_field(self, key, value):
         last_exception = None

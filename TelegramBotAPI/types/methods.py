@@ -2,25 +2,16 @@ from TelegramBotAPI.types.type import Type
 from TelegramBotAPI.types.field import Field
 from TelegramBotAPI.types.primitive import Integer, String, Boolean, Float, InputFile
 from TelegramBotAPI.types.compound import ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply
-from TelegramBotAPI.types.compound import Message, User, UserProfilePhotos, File
+from TelegramBotAPI.types.compound import Update, Message, User, UserProfilePhotos, File
 
 
 class Method(Type):
     _response = None
 
 
-class sendMessage(Method):
-    _response = Message
-
-    chat_id = Field(Integer)
-    text = Field(String)
-    disable_web_page_preview = Field(Boolean, optional=True)
-    reply_to_message_id = Field(Integer, optional=True)
-    reply_markup = Field(ReplyKeyboardHide, ReplyKeyboardMarkup, ForceReply, optional=True)
-    parse_mode = Field(String, optional=True)
-
-
 class getUpdates(Method):
+    _response = Update
+
     offset = Field(Integer, optional=True)
     limit = Field(Integer, optional=True)
     timeout = Field(Integer, optional=True)
@@ -34,25 +25,30 @@ class setWebhook(Method):
 class getMe(Method):
     _response = User
 
-    chat_id = Field(Integer, optional=True)
-    text = Field(String, optional=True)
-    disable_web_page_preview = Field(Boolean)
-    reply_to_message_id = Field(Integer)
-    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply)
+
+class sendMessage(Method):
+    _response = Message
+
+    chat_id = Field(Integer, String)
+    text = Field(String)
+    disable_web_page_preview = Field(Boolean, optional=True)
+    reply_to_message_id = Field(Integer, optional=True)
+    reply_markup = Field(ReplyKeyboardHide, ReplyKeyboardMarkup, ForceReply, optional=True)
+    parse_mode = Field(String, optional=True)
 
 
 class forwardMessage(Method):
     _response = Message
 
-    chat_id = Field(Integer, optional=True)
-    from_chat_id = Field(Integer, optional=True)
-    message_id = Field(Integer, optional=True)
+    chat_id = Field(Integer, String)
+    from_chat_id = Field(Integer, String)
+    message_id = Field(Integer)
 
 
 class sendPhoto(Method):
     _response = Message
 
-    chat_id = Field(Integer)
+    chat_id = Field(Integer, String)
     photo = Field(InputFile, String)
     caption = Field(String, optional=True)
     reply_to_message_id = Field(Integer, optional=True)
@@ -62,8 +58,8 @@ class sendPhoto(Method):
 class sendAudio(Method):
     _response = Message
 
-    chat_id = Field(Integer, String, optional=True)
-    audio = Field(InputFile, String, optional=True)
+    chat_id = Field(Integer, String)
+    audio = Field(InputFile, String)
     duration = Field(Integer, optional=True)
     performer = Field(String, optional=True)
     title = Field(String, optional=True)
@@ -74,37 +70,37 @@ class sendAudio(Method):
 class sendDocument(Method):
     _response = Message
 
-    chat_id = Field(Integer, optional=True)
-    document = Field(InputFile, String, optional=True)
-    reply_to_message_id = Field(Integer)
-    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply)
+    chat_id = Field(Integer, String)
+    document = Field(InputFile, String)
+    reply_to_message_id = Field(Integer, optional=True)
+    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply, optional=True)
 
 
 class sendSticker(Method):
     _response = Message
 
-    chat_id = Field(Integer, optional=True)
-    sticker = Field(InputFile, String, optional=True)
-    reply_to_message_id = Field(Integer)
-    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply)
+    chat_id = Field(Integer, String)
+    sticker = Field(InputFile, String)
+    reply_to_message_id = Field(Integer, optional=True)
+    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply, optional=True)
 
 
 class sendVideo(Method):
     _response = Message
 
-    chat_id = Field(Integer, optional=True)
-    video = Field(InputFile, String, optional=True)
+    chat_id = Field(Integer, String)
+    video = Field(InputFile, String)
     duration = Field(Integer, optional=True)
     caption = Field(String, optional=True)
-    reply_to_message_id = Field(Integer)
-    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply)
+    reply_to_message_id = Field(Integer, optional=True)
+    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply, optional=True)
 
 
 class sendVoice(Method):
     _response = Message
 
-    chat_id = Field(Integer, String, optional=True)
-    audio = Field(InputFile, String, optional=True)
+    chat_id = Field(Integer, String)
+    audio = Field(InputFile, String)
     duration = Field(Integer, optional=True)
     reply_to_message_id = Field(Integer, optional=True)
     reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply, optional=True)
@@ -113,24 +109,24 @@ class sendVoice(Method):
 class sendLocation(Method):
     _response = Message
 
-    chat_id = Field(Integer, optional=True)
-    latitude = Field(Float, optional=True)
-    longitude = Field(Float, optional=True)
-    reply_to_message_id = Field(Integer)
-    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply)
+    chat_id = Field(Integer, String)
+    latitude = Field(Float)
+    longitude = Field(Float)
+    reply_to_message_id = Field(Integer, optional=True)
+    reply_markup = Field(ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply, optional=True)
 
 
 class sendChatAction(Method):
-    chat_id = Field(Integer, optional=True)
-    action = Field(String, optional=True)
+    chat_id = Field(Integer, String)
+    action = Field(String)
 
 
 class getUserProfilePhotos(Method):
     _response = UserProfilePhotos
 
-    user_id = Field(Integer, optional=True)
-    offset = Field(Integer)
-    limit = Field(Integer)
+    user_id = Field(Integer)
+    offset = Field(Integer, optional=True)
+    limit = Field(Integer, optional=True)
 
 
 class getFile(Method):

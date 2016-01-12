@@ -5,3 +5,6 @@ tests/env.py
 .coverage
 _trial_temp*
 virtualenv/
+htmlcov/*
+*.egg-info
+log
