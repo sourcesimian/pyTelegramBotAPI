@@ -8,7 +8,7 @@ fi
 if [ -e virtualenv/ ]; then
     echo "- existing virtualenv found"
 else
-    virtualenv virtualenv
+    python3 -m venv virtualenv
 fi
 
 if [ ! -e virtualenv/ ]; then

@@ -1,4 +1,3 @@
-from TelegramBotAPI.types.type import Type
 
 
 class Field(object):
@@ -24,7 +23,8 @@ class Field(object):
         replace with the real class.
         """
         def load(t):
-            if isinstance(t, basestring):
+            from TelegramBotAPI.types.type import Type
+            if isinstance(t, str):
                 return Type._type(t)
             assert issubclass(t, Type)
             return t

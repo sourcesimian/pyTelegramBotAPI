@@ -22,13 +22,16 @@ class BasicClient(object):
         url = self.__method_url(method._name)
         raw = method._to_raw()
         files = {}
-        for k in raw.keys():
-            if isinstance(raw[k], file):
+        for k in list(raw.keys()):
+            from io import BufferedReader
+            if isinstance(raw[k], BufferedReader):
                 import os
                 files[k] = (os.path.split(raw[k].name)[1], raw[k])
                 del raw[k]
 
         rsp = requests.post(url, data=raw, files=files, proxies=self.__proxies, timeout=self.__timeout)
+        if rsp.status_code != 200:
+            raise Exception("Server error: %s: %s\n%s\n%s" % (rsp.status_code, url, self.__proxies, rsp.text))
         value = rsp.json()
 
         if value['ok'] is not True:

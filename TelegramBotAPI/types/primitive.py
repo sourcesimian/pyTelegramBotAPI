@@ -11,7 +11,7 @@ class String(Type):
     def _from_raw(self, primitive):
         if primitive is None:
             raise TypeError('None is an invalid String')
-        self._d = unicode(primitive)
+        self._d = str(primitive)
         return self._d
 
 
@@ -36,4 +36,4 @@ class InputFile(Type):
         self.__filename = filename
 
     def _to_raw(self, *_s):
-        return open(self.__filename)
+        return open(self.__filename, 'rb')

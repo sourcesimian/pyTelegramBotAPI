@@ -24,11 +24,11 @@ class Methods(TestCase):
 
     def test_primitive(self):
         s = String("Hello there")
-        self.assertEqual('Hello there', s)
+        self.assertEqual('Hello there', s._to_raw())
 
     def test_compount(self):
         u = User({'id': 1234, 'first_name': 'Joe'})
-        self.assertEquals(u, {'id': 1234, 'first_name': 'Joe'})
+        self.assertEquals(u._to_raw(), {'id': 1234, 'first_name': 'Joe'})
 
     def test_bad_init(self):
         self.assertRaises(TypeError, Integer, 1, 2)
@@ -381,31 +381,32 @@ class Methods(TestCase):
 
     def test_input_file(self):
         t = NamedTemporaryFile()
-        t.write('contentcontentcontentcontent')
+        t.write(b'contentcontentcontentcontent')
         t.flush()
 
         f = InputFile(t.name)
 
-        self.assertEqual('contentcontentcontentcontent', f._to_raw().read())
+        self.assertEqual(b'contentcontentcontentcontent', f._to_raw().read())
         self.assertEqual(t.name, f._to_raw().name)
 
     def test_input_file_integration(self):
         t = NamedTemporaryFile()
-        t.write('lalalalalalalalalala')
+        t.write(b'lalalalalalalalalala')
         t.flush()
 
         m = sendAudio()
         m.audio = t.name
 
-        self.assertTrue(isinstance(m._to_raw(strict=False)['audio'], file))
+        from io import BufferedReader
+        self.assertTrue(isinstance(m._to_raw(strict=False)['audio'], BufferedReader))
 
     def test_message_with_photo(self):
-        raw = {u'from': {u'username': u'mybot', u'first_name': u'My bot', u'id': 100000000}, u'photo': [{u'width': 90, u'height': 67, u'file_id': u'AgADBAADrqcxG-n9AQZgjPT5D4Qen5rhjjAABFpmaP_GKjtNk28BAAEC', u'file_size': 629}, {u'width': 100, u'height': 75, u'file_id': u'AgADBAADrqcxG-n9AQZgjPT5D4Qen5rhjjAABFpmaP_GKjtNk28BAAEC', u'file_size': 1345}], u'caption': u'What is this?', u'chat': {u'username': u'jbloggs', u'first_name': u'Joe', u'type': u'private', u'id': 20000000}, u'date': 1446672894, u'message_id': 131}
+        raw = {'from': {'username': 'mybot', 'first_name': 'My bot', 'id': 100000000}, 'photo': [{'width': 90, 'height': 67, 'file_id': 'AgADBAADrqcxG-n9AQZgjPT5D4Qen5rhjjAABFpmaP_GKjtNk28BAAEC', 'file_size': 629}, {'width': 100, 'height': 75, 'file_id': 'AgADBAADrqcxG-n9AQZgjPT5D4Qen5rhjjAABFpmaP_GKjtNk28BAAEC', 'file_size': 1345}], 'caption': 'What is this?', 'chat': {'username': 'jbloggs', 'first_name': 'Joe', 'type': 'private', 'id': 20000000}, 'date': 1446672894, 'message_id': 131}
         m = Message()
         m._from_raw(raw)
 
     def test_message_with_photo2(self):
-        raw = {'date': 1446760513, 'photo': [{'width': 40, 'file_size': 823, 'file_id': u'AgADBAADOqoxG396-QAB_l-8dsikQCIjMtswAASsEEgWRcFfw0EVAQABAg', 'height': 90}, {'width': 143, 'file_size': 9252, 'file_id': u'AgADBAADOqoxG396-QAB_l-8dsikQCIjMtswAASsEEgWRcFfw0EVAQABAg', 'height': 320}, {'width': 164, 'file_size': 11766, 'file_id': u'AgADBAADOqoxG396-QAB_l-8dsikQCIjMoswAAS1BhTBUPT5Tj8VAQABAg', 'height': 366}], 'from': {'username': u'jbloggs', 'first_name': u'Joe', 'id': 20000000}, 'message_id': 137, 'chat': {'username': u'jbloggs', 'first_name': u'Joe', 'type': u'private', 'id': 2000000}}
+        raw = {'date': 1446760513, 'photo': [{'width': 40, 'file_size': 823, 'file_id': 'AgADBAADOqoxG396-QAB_l-8dsikQCIjMtswAASsEEgWRcFfw0EVAQABAg', 'height': 90}, {'width': 143, 'file_size': 9252, 'file_id': 'AgADBAADOqoxG396-QAB_l-8dsikQCIjMtswAASsEEgWRcFfw0EVAQABAg', 'height': 320}, {'width': 164, 'file_size': 11766, 'file_id': 'AgADBAADOqoxG396-QAB_l-8dsikQCIjMoswAAS1BhTBUPT5Tj8VAQABAg', 'height': 366}], 'from': {'username': 'jbloggs', 'first_name': 'Joe', 'id': 20000000}, 'message_id': 137, 'chat': {'username': 'jbloggs', 'first_name': 'Joe', 'type': 'private', 'id': 2000000}}
         m = Message()
         m._from_raw(raw)
 

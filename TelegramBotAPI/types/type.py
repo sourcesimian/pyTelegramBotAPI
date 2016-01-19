@@ -1,9 +1,11 @@
+_type_map = {}
+
 
 class TypeMeta(type):
     def __new__(mcs, name, bases, attrs):
         cls = type.__new__(mcs, name, bases, attrs)
         if '__metaclass__' not in attrs:
-            Type._Type__type_map[name.lower()] = cls  # pylint: disable=no-member
+            _type_map[name.lower()] = cls
             from TelegramBotAPI.types.field import Field
             cls._valid_fields = {}
             for n in dir(cls):
@@ -14,15 +16,13 @@ class TypeMeta(type):
         return cls
 
 
-class Type(object):
-    __metaclass__ = TypeMeta
-
-    __type_map = {}
+class Type(object, metaclass=TypeMeta):
+    __type_map = _type_map
     _fields = None
     _d = None
 
     def __init__(self, *args):
-        for field in self._valid_fields.itervalues():
+        for field in self._valid_fields.values():
             field.setup_types()
         if len(args) > 1:
             raise TypeError('%s can take up to 1 argument (%d given)' % (self.__class__.__name__,
@@ -42,7 +42,7 @@ class Type(object):
             else:
                 ad = AssignDelegate(self._d, key, self._valid_fields[key])
                 ad._from_raw(raw[key])
-        for key, field in self._valid_fields.iteritems():
+        for key, field in self._valid_fields.items():
             if field.optional is False and key not in self._d:
                 raise TypeError('"%s" is an expected field in %s' % (key, self.__class__.__name__))
 
@@ -62,7 +62,7 @@ class Type(object):
     @classmethod
     def _new(cls, value, type_name=None):
         if type_name is None:
-            type_name = set(value.keys()).intersection(cls.__type_map.keys())
+            type_name = set(value.keys()).intersection(list(cls.__type_map.keys()))
             assert len(type_name) == 1
             type_name = type_name.pop()
             value = value[type_name]
@@ -111,7 +111,7 @@ class Type(object):
         return self.__get(key)
 
     def __get(self, key):
-        if not isinstance(key, basestring):
+        if not isinstance(key, str):
             raise AttributeError("'%s' has no field '%s'" % (self._name, key))
         name = key.lower()
         if self._d and name in self._d:
@@ -190,7 +190,7 @@ class AssignDelegate(Delegate):
                 value = cls()
                 value._from_raw(raw)
                 return value
-            except TypeError, e:
+            except TypeError as e:
                 last_exception = e
         raise TypeError('%s "%s" = "%s": %s' % (self._field, self._key,
                                                 repr(raw), last_exception,))
@@ -202,7 +202,7 @@ class AssignDelegate(Delegate):
                 v = cls()
                 setattr(v, key, value)
                 return v
-            except TypeError, e:
+            except TypeError as e:
                 last_exception = e
         raise last_exception  # pylint: disable=raising-bad-type
 
@@ -268,3 +268,6 @@ class ListDelegate(Delegate):
 
     def __len__(self):
         return len(self._l)
+
+
+__all__ = ['Type']
