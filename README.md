@@ -3,10 +3,11 @@ Telegram Bot API
 
 ref: https://core.telegram.org/bots/api
 
+also see: [pyTelegramBot](https://github.com/sourcesimian/pyTelegramBot)
 
 ## Installation
 
-    pip install https://github.com/sourcesimian/pyTelegramBotAPI/tarball/master#egg=TelegramBotAPI-0.1
+    pip install https://github.com/sourcesimian/pyTelegramBotAPI/tarball/v0.2#egg=TelegramBotAPI-0.2
 
 ## Usage
     from TelegramBotAPI.client.basic import BasicClient
@@ -48,8 +49,8 @@ You can easily add TelegramBotAPI as an install dependency of your own project, 
     setup(
        name="myApp",
        ...
-       install_requires=[..., 'TelegramBotAPI==0.1'],
-       dependency_links = ['https://github.com/sourcesimian/pyTelegramBotAPI/tarball/master#egg=TelegramBotAPI-0.1',]
+       install_requires=[..., 'TelegramBotAPI==0.2'],
+       dependency_links = ['https://github.com/sourcesimian/pyTelegramBotAPI/tarball/v0.2#egg=TelegramBotAPI-0.2',]
     )
 
 This will allow your package to be installed using:
