@@ -2,8 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name="TelegramBotAPI",
-    version="0.2",
+    version="0.2.1",
     description="Telegram Bot API",
+    author="Source Simian",
+    author_email='sourcesimian@users.noreply.github.com',
+    url='https://github.com/sourcesimian/pyTelegramBotAPI',
+    download_url="https://github.com/sourcesimian/pyPlugin/tarball/v0.2.1",
+    license='MIT',
     packages=find_packages(exclude=['tests',]),
     install_requires=[
         'pyOpenSSL',

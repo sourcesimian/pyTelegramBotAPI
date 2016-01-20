@@ -1,60 +1,69 @@
 # TelegramBotAPI (unofficial)
-Telegram Bot API
+Telegram Bot API in Python3
 
 ref: https://core.telegram.org/bots/api
 
-also see: [pyTelegramBot](https://github.com/sourcesimian/pyTelegramBot)
-
 ## Installation
 
-    pip install https://github.com/sourcesimian/pyTelegramBotAPI/tarball/v0.2#egg=TelegramBotAPI-0.2
+    pip3 install TelegramBotAPI
 
 ## Usage
-    from TelegramBotAPI.client.basic import BasicClient
-    from TelegramBotAPI.types.methods import sendMessage, getUpdates
-    from TelegramBotAPI.types.compound import Message, File
+### Basic Client
+```
+from TelegramBotAPI.client.basic import BasicClient
+from TelegramBotAPI.types.methods import sendMessage, getUpdates
+from TelegramBotAPI.types.compound import Message, File
 
-    # setup
-    client = BasicClient(_token)
-
-
-    # send_message
-    msg = sendMessage()
-    msg.chat_id = 1234
-    msg.text = 'hello there'
-
-    client.post(msg)
+# setup
+client = BasicClient(_token)
 
 
-    # poll updates
-    msg = getUpdates()
-    msg.timeout = _timeout
-    msg.limit = _limit
-    msg.offset = last_id + 1
+# send_message
+msg = sendMessage()
+msg.chat_id = 1234
+msg.text = 'hello there'
 
-    updates, last_id = client.post(msg)
+client.post(msg)
 
-    for update in updates:
-        if isinstance(update, Message):
-            print update.text
-        elif isinstance(update, File):
-            url = update.download_url(_token)
 
-## Integration
+# poll updates
+msg = getUpdates()
+msg.timeout = _timeout
+msg.limit = _limit
+msg.offset = last_id + 1
 
-You can easily add TelegramBotAPI as an install dependency of your own project, e.g.:
+updates, last_id = client.post(msg)
 
-    from setuptools import setup
+for update in updates:
+    if isinstance(update, Message):
+        print update.text
+    elif isinstance(update, File):
+        url = update.download_url(_token)
+```
 
-    setup(
-       name="myApp",
-       ...
-       install_requires=[..., 'TelegramBotAPI==0.2'],
-       dependency_links = ['https://github.com/sourcesimian/pyTelegramBotAPI/tarball/v0.2#egg=TelegramBotAPI-0.2',]
-    )
+### Twisted Python Client
+The following code fragments demonstrate how to make use of the Twisted client.
+```
+from TelegramBotAPI.client.twistedclient import TwistedClient
 
-This will allow your package to be installed using:
+    ...
+    multi = service.MultiService()
+    
+    bot = BotService(...)
+    bot.setServiceParent(multi)
+    
+    client = TwistedClient(token, bot.on_update, proxy=proxy)
+    client.setServiceParent(multi)
+```
 
-    pip install https://github.com/jbloggs/myApp/tarball/master#egg=myutil-0.1 --process-dependency-links
+```
+class BotService(service.Service):
+    _client = None
 
-See: https://pip.pypa.io/en/latest/reference/pip_install.html#vcs-support
+    @defer.inlineCallbacks
+    def startService(self):
+        self._client = self.parent.getServiceNamed('telegrambot_client')
+
+    def send_message(self, message):
+        return self._client.send_message(message)
+```

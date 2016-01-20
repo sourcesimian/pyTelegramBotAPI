@@ -3,7 +3,7 @@ from unittest import TestCase
 from TelegramBotAPI.client import BasicClient
 from TelegramBotAPI.types.methods import getUpdates, sendMessage, sendPhoto
 
-from . import env
+import env
 
 
 class BasicClientTest(TestCase):
@@ -17,10 +17,8 @@ class BasicClientTest(TestCase):
         m = getUpdates()
         m.timeout = 5
         m.limit = 5
-        #m.offset = 585177182
-        updates, update_id = self._client.post(m)
+        updates = self._client.post(m)
 
-        print("Latest offset: %s" % update_id)
         for update in updates:
             print(update)
 

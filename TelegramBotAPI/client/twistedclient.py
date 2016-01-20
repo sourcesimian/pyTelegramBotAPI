@@ -7,7 +7,7 @@ from twisted.python import log
 
 
 class TwistedClient(service.Service):
-    name = 'telegram_client'
+    name = 'telegrambot_client'
 
     _limit = 10
     _timeout = 5
