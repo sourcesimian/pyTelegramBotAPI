@@ -30,5 +30,3 @@ pip install pep8
 pip install pylint
 pip install pyflakes
 pip install coverage
-
-git update-index --assume-unchanged tests/env.py

@@ -1,7 +1,10 @@
-# TelegramBotAPI (unofficial)
-Telegram Bot API in Python3
+# Telegram Bot API (unofficial) in Python 3
+An implementation of the [Telegram Bot API](https://core.telegram.org/bots/api) messages
+and some simple clients.
 
-ref: https://core.telegram.org/bots/api
+Used by:
+* [txTelegramBot](https://github.com/sourcesimian/txTelegramBot) - An easily customisable bot written in Twisted Python3.
+
 
 ## Installation
 
