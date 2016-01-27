@@ -29,6 +29,6 @@ to_pypi_test:
 	python setup.py sdist upload -r pypitest
 
 
-to_pypi:
+to_pypi_live:
 	python setup.py register -r pypi
 	python setup.py sdist upload -r pypi

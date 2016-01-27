@@ -146,10 +146,10 @@ class Type(object, metaclass=TypeMeta):
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, str(self._to_raw(strict=False)))
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if self._leaf:
-            return cmp(self._d, other)
-        return cmp(self._to_raw(strict=False), other)
+            return self._d == other
+        return repr(self._to_raw(strict=False)) == repr(other._to_raw(strict=False))
 
     def __field_error(self, key):
         raise KeyError('"%s" does not have a "%s" field' % (self.__class__.__name__, key))

@@ -83,8 +83,8 @@ class TwistedClient(service.Service):
                 try:
                     yield defer.maybeDeferred(self._on_update, update.message)
                 except Exception as e:
-                    #import traceback
-                    #log.msg(traceback.format_exc())
+                    # import traceback
+                    # log.msg(traceback.format_exc())
                     log.msg(e)
                     pass
 

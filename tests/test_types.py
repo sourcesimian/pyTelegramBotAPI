@@ -429,6 +429,15 @@ class Methods(TestCase):
 
         self.assertEqual(exp, m.download_url(token))
 
+    def test_eq(self):
+        m1 = Message()
+        m1.text = "hello"
+
+        m2 = Message()
+        m2.text = "hello"
+
+        self.assertEqual(m1, m2)
+
 
 if __name__ == '__main__':
     import unittest

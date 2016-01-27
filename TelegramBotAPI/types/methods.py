@@ -133,3 +133,13 @@ class getFile(Method):
     _response = File
 
     file_id = Field(String)
+
+
+class answerInlineQuery(Method):
+    _response = Boolean
+
+    inline_query_id = Field(String)
+    results = Field(['InlineQueryResultArticle', ''])
+    cache_time = Field(Integer, optional=True)
+    is_personal = Field(Boolean, optional=True)
+    next_offset = Field(String, optional=True)

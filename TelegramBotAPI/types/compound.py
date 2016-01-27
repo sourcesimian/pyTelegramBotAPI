@@ -6,6 +6,8 @@ from TelegramBotAPI.types.primitive import Integer, String, Boolean, Float
 class Update(Type):
     update_id = Field(Integer)
     message = Field('Message', optional=True)
+    inline_query = Field('InlineQuery', optional=True)
+    chosen_inline_result = Field('ChosenInlineResult', optional=True)
 
 
 class User(Type):
@@ -150,3 +152,90 @@ class Error(Type):
     error_code = Field(Integer)
     ok = Field(String)
     description = Field(String)
+
+
+class InlineQuery(Type):
+    id = Field(String)
+    froM = Field(User)
+    query = Field(String)
+    offset = Field(String)
+
+
+class InlineQueryResultArticle(Type):
+    type = Field(String)
+    id = Field(String)
+    title = Field(String)
+    message_text = Field(String)
+    parse_mode = Field(String)
+    disable_web_page_preview = Field(Boolean, optional=True)
+    url = Field(String, optional=True)
+    hide_url = Field(Boolean, optional=True)
+    description = Field(String, optional=True)
+    thumb_url = Field(String, optional=True)
+    thumb_width = Field(Integer, optional=True)
+    thumb_height = Field(Integer, optional=True)
+
+
+class InlineQueryResultPhoto(Type):
+    type = Field(String)
+    id = Field(String)
+    photo_url = Field(String)
+    photo_width = Field(Integer, optional=True)
+    photo_height = Field(Integer, optional=True)
+    thumb_url = Field(String)
+    title = Field(String, optional=True)
+    description = Field(String, optional=True)
+    caption = Field(String, optional=True)
+    message_text = Field(String, optional=True)
+    parse_mode = Field(String, optional=True)
+    disable_web_page_preview = Field(Boolean, optional=True)
+
+
+class InlineQueryResultGif(Type):
+    type = Field(String)
+    id = Field(String)
+    gif_url = Field(String)
+    gif_width = Field(Integer, optional=True)
+    gif_height = Field(Integer, optional=True)
+    thumb_url = Field(String)
+    title = Field(String, optional=True)
+    caption = Field(String, optional=True)
+    message_text = Field(String, optional=True)
+    parse_mode = Field(String, optional=True)
+    disable_web_page_preview = Field(Boolean, optional=True)
+
+
+class InlineQueryResultMpeg4Gif(Type):
+    type = Field(String)
+    id = Field(String)
+    mpeg4_url = Field(String)
+    mpeg4_width = Field(Integer, optional=True)
+    mpeg4_height = Field(Integer, optional=True)
+    thumb_url = Field(String)
+    title = Field(String, optional=True)
+    caption = Field(String, optional=True)
+    message_text = Field(String, optional=True)
+    parse_mode = Field(String, optional=True)
+    disable_web_page_preview = Field(Boolean, optional=True)
+
+
+class InlineQueryResultVideo(Type):
+    type = Field(String)
+    id = Field(String)
+    video_url = Field(String)
+    mime_type = Field(String)
+    message_text = Field(String)
+    parse_mode = Field(String, optional=True)
+    disable_web_page_preview = Field(Boolean, optional=True)
+    video_width = Field(Integer, optional=True)
+    video_height = Field(Integer, optional=True)
+    video_duration = Field(Integer, optional=True)
+    thumb_url = Field(String)
+    title = Field(String)
+    description = Field(String, optional=True)
+
+
+class ChosenInlineResult(Type):
+    result_id = Field(String)
+    froM = Field(User)
+    query = Field(String)
