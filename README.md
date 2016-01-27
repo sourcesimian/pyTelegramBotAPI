@@ -35,13 +35,19 @@ msg.timeout = _timeout
 msg.limit = _limit
 msg.offset = last_id + 1
 
-updates, last_id = client.post(msg)
+updates = client.post(msg)
 
+
+# handle updates
 for update in updates:
-    if isinstance(update, Message):
-        print update.text
-    elif isinstance(update, File):
-        url = update.download_url(_token)
+    last_id = update.update_id
+
+    if hasattr(update, 'message'):
+        print("message:", update.message)
+    if hasattr(update, 'inline_query'):
+        print("inline_query", update.inline_query)
+    if hasattr(update, 'chosen_inline_result'):
+        print("inline_query", update.chosen_inline_result)
 ```
 
 ### Twisted Python Client
