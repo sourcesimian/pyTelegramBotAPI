@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from TelegramBotAPI.client import BasicClient
+from TelegramBotAPI.client.requestsclient import RequestsClient
 from TelegramBotAPI.types.methods import getUpdates, sendMessage, sendPhoto
 
 import env
@@ -11,13 +11,13 @@ class BasicClientTest(TestCase):
 
     def setUp(self):
         if self._client is None:
-            self._client = BasicClient(env.token, env.proxy)
+            self._client = RequestsClient(env.token, env.proxy)
 
     def test_poll(self):
         m = getUpdates()
         m.timeout = 5
         m.limit = 5
-        updates = self._client.post(m)
+        updates = self._client.send_method(m)
 
         for update in updates:
             print(update)
@@ -26,7 +26,7 @@ class BasicClientTest(TestCase):
         m = sendMessage()
         m.chat_id = env.uid
         m.text = "Hi there"
-        resp = self._client.post(m)
+        resp = self._client.send_method(m)
         print(resp)
 
     def test_send_photo(self):
@@ -36,6 +36,6 @@ class BasicClientTest(TestCase):
         import os
         m.photo = os.path.join(os.path.split(__file__)[0], "test.jpg")
 
-        resp = self._client.post(m)
+        resp = self._client.send_method(m)
         print(resp)
 

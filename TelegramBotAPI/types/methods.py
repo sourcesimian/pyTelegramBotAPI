@@ -117,6 +117,8 @@ class sendLocation(Method):
 
 
 class sendChatAction(Method):
+    _response = Boolean
+
     chat_id = Field(Integer, String)
     action = Field(String)
 
