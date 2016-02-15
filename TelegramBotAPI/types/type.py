@@ -35,7 +35,8 @@ class Type(object, metaclass=TypeMeta):
 
         for key in raw:
             if key not in self._valid_fields:
-                raise TypeError(key)
+                raise TypeError('%s does not have a "%s" field: %s' % (self.__class__.__name__,
+                                                                       key, raw))
             if self._valid_fields[key].list:
                 ld = ListDelegate(self._d, key, self._valid_fields[key])
                 ld.extend(raw[key])

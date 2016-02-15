@@ -1,3 +1,4 @@
+import os
 from TelegramBotAPI.types.type import Type
 
 
@@ -33,6 +34,8 @@ class Float(Type):
 
 class InputFile(Type):
     def _from_raw(self, filename):
+        if not os.path.isfile(filename):
+            raise TypeError('Not a valid file')
         self.__filename = filename
 
     def _to_raw(self, *_s):

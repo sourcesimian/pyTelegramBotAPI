@@ -1,14 +1,22 @@
+import logging
+
 from TelegramBotAPI.types.compound import Error
+
+log = logging.getLogger(__name__)
 
 
 class BaseClient(object):
-    def __init__(self, token):
+    def __init__(self, token, debug=False):
         self.__token = token
+        self._debug = debug
 
     def _get_post_url(self, method):
         return 'https://api.telegram.org/bot%s/%s' % (self.__token, method._name)
 
     def _interpret_response(self, value, method):
+        if self._debug:
+            log.debug('RSP: %s', value)
+
         if value['ok'] is not True:
             e = Error()
             e._from_raw(value)

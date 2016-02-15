@@ -1,18 +1,20 @@
+import logging
 import os
-import aiohttp
+from io import BufferedReader
 import asyncio
+import aiohttp
 from aiohttp.helpers import FormData
 
 from TelegramBotAPI.client.baseclient import BaseClient
+
+log = logging.getLogger(__name__)
 
 
 class AsyncioClient(BaseClient):
     __connector = None
 
-    def __init__(self, token, on_update, proxy=None):
-        super(AsyncioClient, self).__init__(token)
-        assert callable(on_update)
-        self._on_update = on_update
+    def __init__(self, token, proxy=None, debug=False):
+        super(AsyncioClient, self).__init__(token, debug=debug)
 
         if proxy:
             self.__connector = aiohttp.ProxyConnector(proxy="http://%s" % proxy)
@@ -32,10 +34,11 @@ class AsyncioClient(BaseClient):
 
     def __get_post_data(self, method):
         raw = method._to_raw()
+        if self._debug:
+            log.debug('CMD: %s', raw)
 
         use_multipart = False
         for k in list(raw.keys()):
-            from io import BufferedReader
             if isinstance(raw[k], BufferedReader):
                 use_multipart = True
                 break
@@ -45,7 +48,6 @@ class AsyncioClient(BaseClient):
 
         data = FormData()
         for k in list(raw.keys()):
-            from io import BufferedReader
             if isinstance(raw[k], BufferedReader):
                 filename = os.path.split(raw[k].name)[1]
                 data.add_field(k, raw[k].read(), filename=filename)
