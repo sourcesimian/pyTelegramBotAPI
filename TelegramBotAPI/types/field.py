@@ -2,10 +2,15 @@
 
 class Field(object):
     def __init__(self, *args, **kwargs):
-        self.optional = kwargs.get('optional', False)
         self.list = False
-
         self.types = []
+
+        self.optional = kwargs.get('optional', False)
+        self.ignore = kwargs.get('ignore', False)
+        if self.ignore:
+            self.optional = True
+            return
+
         for type in args:
             if isinstance(type, list):
                 type = type[0]

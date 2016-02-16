@@ -57,7 +57,7 @@ class PhotoSize(Type):
     width = Field(Integer)
     height = Field(Integer)
     file_size = Field(Integer, optional=True)
-    file_path = Field(String, optional=True)
+    file_path = Field(ignore=True)
 
 
 class Audio(Type):

@@ -5,7 +5,6 @@ from TelegramBotAPI.types.type import Type
 class Integer(Type):
     def _from_raw(self, primitive):
         self._d = int(primitive)
-        return self._d
 
 
 class String(Type):
@@ -13,7 +12,6 @@ class String(Type):
         if primitive is None:
             raise TypeError('None is an invalid String')
         self._d = str(primitive)
-        return self._d
 
 
 class Boolean(Type):
@@ -21,7 +19,6 @@ class Boolean(Type):
         if not isinstance(primitive, bool):
             raise TypeError('Not a Boolean type')
         self._d = bool(primitive)
-        return self._d
 
 
 class Float(Type):
@@ -29,7 +26,6 @@ class Float(Type):
         if not (isinstance(primitive, int) or isinstance(primitive, float)):
             raise TypeError('Not a Float type')
         self._d = float(primitive)
-        return self._d
 
 
 class InputFile(Type):
@@ -38,5 +34,5 @@ class InputFile(Type):
             raise TypeError('Not a valid file')
         self.__filename = filename
 
-    def _to_raw(self, *_s):
+    def _to_raw(self, strict=True):
         return open(self.__filename, 'rb')

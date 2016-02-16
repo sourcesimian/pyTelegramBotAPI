@@ -27,6 +27,9 @@ class BaseClient(object):
             for result in value['result']:
                 m = method._response()
                 m._from_raw(result)
+                dropped = m._from_raw_dropped()
+                if dropped:
+                    log.warning('%s dropped %s', m.__class__.__name__, dropped)
                 responses.append(m)
             return responses
         else:
@@ -35,6 +38,9 @@ class BaseClient(object):
             except TypeError:
                 raise Exception('%s._response not defined' % method.__class__.__name__)
             m._from_raw(value['result'])
+            dropped = m._from_raw_dropped()
+            if dropped:
+                log.warning('%s dropped %s', m.__class__.__name__, dropped)
             return m
 
     def _check_response_status(self, status, url, proxy, get_body):

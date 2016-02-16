@@ -1,3 +1,6 @@
+import logging
+
+log = logging.getLogger(__name__)
 _type_map = {}
 
 
@@ -18,6 +21,8 @@ class TypeMeta(type):
 
 class Type(object, metaclass=TypeMeta):
     __type_map = _type_map
+    __from_raw_dropped = None
+    __from_raw_found = None
     _fields = None
     _d = None
 
@@ -32,22 +37,32 @@ class Type(object, metaclass=TypeMeta):
 
     def _from_raw(self, raw):
         self._d = {}
+        self.__from_raw_dropped = {}
+        self.__from_raw_found = 0
 
         for key in raw:
             if key not in self._valid_fields:
-                raise TypeError('%s does not have a "%s" field: %s' % (self.__class__.__name__,
-                                                                       key, raw))
+                self.__from_raw_dropped[key] = raw[key]
+                continue
+
+            if self._valid_fields[key].ignore:
+                self.__from_raw_found += 1
+                continue
+
             if self._valid_fields[key].list:
                 ld = ListDelegate(self._d, key, self._valid_fields[key])
                 ld.extend(raw[key])
             else:
                 ad = AssignDelegate(self._d, key, self._valid_fields[key])
                 ad._from_raw(raw[key])
+            self.__from_raw_found += 1
+
         for key, field in self._valid_fields.items():
             if field.optional is False and key not in self._d:
                 raise TypeError('"%s" is an expected field in %s' % (key, self.__class__.__name__))
 
-        return self._d
+        if self.__from_raw_found == 0:
+            raise TypeError('No fields were found for % in %s' % (self.__class__.__name__, raw))
 
     def _to_raw(self, strict=True):
         if self._leaf:
@@ -59,6 +74,22 @@ class Type(object, metaclass=TypeMeta):
             elif strict and self._valid_fields[key].optional is False:
                 raise KeyError('"%s" is an expected field in %s' % (key, self.__class__.__name__))
         return raw
+
+    def _from_raw_dropped(self):
+        if self._leaf:
+            return None
+        dropped = self.__from_raw_dropped
+        for key in self._valid_fields:
+            if self._d is not None and key in self._d:
+                d = self._d[key]._from_raw_dropped()
+                if d:
+                    dropped[key] = d
+        return dropped
+
+    def _from_raw_found(self):
+        if self._leaf:
+            return 1
+        return self.__from_raw_found
 
     @classmethod
     def _new(cls, value, type_name=None):
@@ -114,6 +145,7 @@ class Type(object, metaclass=TypeMeta):
     def __get(self, key):
         if not isinstance(key, str):
             raise AttributeError("'%s' has no field '%s'" % (self._name, key))
+
         name = key.lower()
         if self._d and name in self._d:
             if self._d[name]._leaf:
@@ -184,17 +216,29 @@ class AssignDelegate(Delegate):
         raise NotImplementedError('Deep nesting not implemented')
 
     def __from_raw(self, raw):
-        last_exception = None
-        for cls in self._field.types:
+        assert not self._field.list
+
+        def upcast(cls, raw):
             try:
-                assert not self._field.list
                 value = cls()
                 value._from_raw(raw)
-                return value
+                return value._from_raw_found(), value
             except TypeError as e:
-                last_exception = e
-        raise TypeError('%s "%s" = "%s": %s' % (self._field, self._key,
-                                                repr(raw), last_exception,))
+                return -1, e
+
+        candidates = [upcast(cls, raw) for cls in self._field.types]
+
+        best = None
+        rank = -1
+        for r, v in candidates:
+            if r > rank:
+                best = v
+                rank = r
+
+        if best is None:
+            raise TypeError('None of %s accepted: %s : %s' % (self._field.types, raw, candidates))
+
+        return best
 
     def __from_field(self, key, value):
         last_exception = None
@@ -238,6 +282,17 @@ class ListDelegate(Delegate):
                 ret.append(v._to_raw(strict))
             elif strict:
                 raise IndexError('Index [%d] of list "%s" not set' % (i, self._key))
+        return ret
+
+    def _from_raw_dropped(self):
+        ret = []
+
+        for i in range(len(self._l)):
+            v = self._l[i]
+            if v:
+                d = v._from_raw_dropped()
+                if d:
+                    ret.append(d)
         return ret
 
     def __setitem__(self, index, value):

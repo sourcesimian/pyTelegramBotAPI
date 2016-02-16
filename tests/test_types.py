@@ -41,7 +41,16 @@ class Methods(TestCase):
     def test_new_with_extra(self):
         res = json.loads(_update_rsp)['result'][0]
         res['message']['foo'] = 'bar'
-        self.assertRaises(TypeError, Type._new, res)
+        value = Type._new(res)
+        self.assertEquals(value._from_raw_dropped(), {'foo': 'bar'})
+
+    def test_from_raw_with_ignored(self):
+        raw = {'file_path': 'photo/file_39.jpg', 'height': 90, 'file_size': 1694, 'file_id': 'abcde', 'width': 90}
+        from TelegramBotAPI.types.compound import PhotoSize
+        value = PhotoSize()
+        value._from_raw(raw)
+        self.assertEqual(value._from_raw_found(), len(raw))
+        self.assertEquals(value._from_raw_dropped(), {})
 
     def test_new_with_missing(self):
         res = json.loads(_update_rsp)['result'][0]
