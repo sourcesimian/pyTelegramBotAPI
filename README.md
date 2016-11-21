@@ -3,7 +3,8 @@ An implementation of the [Telegram Bot API](https://core.telegram.org/bots/api) 
 and some simple clients.
 
 Used by:
-* [txTelegramBot](https://github.com/sourcesimian/txTelegramBot) - An easily customisable bot written in Twisted Python3.
+* [aioTelegramBot](https://github.com/sourcesimian/aioTelegramBot) - An easily customisable bot written in asyncio Python3.
+~~* [txTelegramBot](https://github.com/sourcesimian/txTelegramBot) - An easily customisable bot written in Twisted Python3.~~
 
 
 ## Installation
@@ -11,22 +12,22 @@ Used by:
     pip3 install TelegramBotAPI
 
 ## Usage
-### Basic Client
+### Requests Client
+
 ```
-from TelegramBotAPI.client.basic import BasicClient
-from TelegramBotAPI.types.methods import sendMessage, getUpdates
-from TelegramBotAPI.types.compound import Message, File
+from TelegramBotAPI.client.requestsclient import RequestsClient
+from TelegramBotAPI.types.methods import getUpdates, sendMessage
 
 # setup
-client = BasicClient(_token)
-
+client = RequestsClient(_token)
 
 # send_message
 msg = sendMessage()
-msg.chat_id = 1234
+msg.chat_id = _user_id
 msg.text = 'hello there'
 
-client.post(msg)
+resp = client.send_method(msg)
+print(resp)
 
 
 # poll updates
@@ -35,44 +36,40 @@ msg.timeout = _timeout
 msg.limit = _limit
 msg.offset = last_id + 1
 
-updates = client.post(msg)
+updates = client.send_method(msg)
 
-
-# handle updates
 for update in updates:
-    last_id = update.update_id
-
-    if hasattr(update, 'message'):
-        print("message:", update.message)
-    if hasattr(update, 'inline_query'):
-        print("inline_query", update.inline_query)
-    if hasattr(update, 'chosen_inline_result'):
-        print("inline_query", update.chosen_inline_result)
+    print(update)
 ```
 
-### Twisted Python Client
-The following code fragments demonstrate how to make use of the Twisted client.
+### Python asyncio Client
 ```
-from TelegramBotAPI.client.twistedclient import TwistedClient
+import asyncio
 
-    ...
-    multi = service.MultiService()
-    
-    bot = BotService(...)
-    bot.setServiceParent(multi)
-    
-    client = TwistedClient(token, bot.on_update, proxy=proxy)
-    client.setServiceParent(multi)
-```
+from TelegramBotAPI.client.asyncioclient import AsyncioClient
+from TelegramBotAPI.types.methods import getUpdates, sendMessage
 
-```
-class BotService(service.Service):
-    _client = None
 
-    @defer.inlineCallbacks
-    def startService(self):
-        self._client = self.parent.getServiceNamed('telegrambot_client')
+@asyncio.coroutine
+def main():
+    client = AsyncioClient(_token)
 
-    def send_message(self, message):
-        return self._client.send_message(message)
+    # send message
+    msg = sendMessage()
+    msg.chat_id = _user_id
+    msg.text = 'hello there'
+
+    resp = yield from client.send_method(msg)
+    print(resp)
+
+    # poll updates
+    msg = getUpdates()
+    msg.timeout = _timeout
+    msg.limit = _limit
+    msg.offset = last_id + 1
+
+    updates = yield from client.send_method(msg)
+
+    for update in updates:
+        print(update)
 ```
