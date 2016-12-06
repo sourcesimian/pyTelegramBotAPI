@@ -22,7 +22,7 @@ class TestAsyncioClient(TestCase):
 
     def setUp(self):
         if self._client is None:
-            self._client = AsyncioClient(env.token, self._on_update, env.proxy)
+            self._client = AsyncioClient(env.token, env.proxy)
 
     def _on_update(self, message):
         pass
@@ -46,12 +46,44 @@ class TestAsyncioClient(TestCase):
         print(resp)
 
     @aioloop
-    def test_send_photo(self):
+    def test_send_photo_by_filename(self):
         m = sendPhoto()
         m.chat_id = env.uid
         m.caption = "What is this?"
         import os
-        m.photo = os.path.join(os.path.split(__file__)[0], "test.jpg")
+        filename = os.path.join(os.path.split(__file__)[0], "test.jpg")
+        m.photo = filename
+
+        resp = yield from self._client.send_method(m)
+        print(resp)
+
+    @aioloop
+    def test_send_photo_by_filehandle(self):
+        m = sendPhoto()
+        m.chat_id = env.uid
+        m.caption = "What is this?"
+        import os
+        filename = os.path.join(os.path.split(__file__)[0], "test.jpg")
+        with open(filename, 'rb') as fh:
+            m.photo = fh
+
+            resp = yield from self._client.send_method(m)
+            print(resp)
+
+    @aioloop
+    def test_send_photo_by_bytes(self):
+        m = sendPhoto()
+        m.chat_id = env.uid
+        m.caption = "What is this?"
+        import os
+        filename = os.path.join(os.path.split(__file__)[0], "test.jpg")
+        import io
+        import shutil
+        bytes = io.BytesIO()
+        with open(filename, 'rb') as fh:
+            shutil.copyfileobj(fh, bytes)
+        bytes.seek(0)
+        m.photo = bytes
 
         resp = yield from self._client.send_method(m)
         print(resp)

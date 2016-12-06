@@ -39,3 +39,8 @@ class RequestsClient(BaseClient):
                 files[k] = (os.path.split(raw[k].name)[1], raw[k])
                 del raw[k]
         return raw, files
+
+    def _check_response_status(self, status, url, proxy, get_body):
+        if status != 200:
+            raise Exception("Server error: %s: %s\n%s\n%s" %
+                            (status, url, proxy, get_body()))

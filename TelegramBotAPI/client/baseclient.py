@@ -42,8 +42,3 @@ class BaseClient(object):
             if dropped:
                 log.warning('%s dropped %s', m.__class__.__name__, dropped)
             return m
-
-    def _check_response_status(self, status, url, proxy, get_body):
-        if status != 200:
-            raise Exception("Server error: %s: %s\n%s\n%s" %
-                            (status, url, proxy, get_body()))

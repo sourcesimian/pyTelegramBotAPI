@@ -151,6 +151,7 @@ class Type(object, metaclass=TypeMeta):
             if self._d[name]._leaf:
                 return self._d[name]._d
             return self._d[name]
+
         if name in self._valid_fields:
             if self._valid_fields[name].leaf and not self._valid_fields[name].list:
                 raise AttributeError("Optional field '%s' not found in '%s'" % (key, self._name))
@@ -213,7 +214,31 @@ class AssignDelegate(Delegate):
         self._d[self._key] = self.__from_field(key, value)
 
     def __getattr__(self, key):
-        raise NotImplementedError('Deep nesting not implemented')
+        return self.__get(key)
+
+    def __get(self, key):
+        if key.startswith('_'):
+            return super(AssignDelegate, self).__getattribute__(key)
+        if not isinstance(key, str):
+            raise AttributeError("'%s' has no field '%s'" % (self._name, key))
+
+        name = key.lower()
+
+        for _type in self._field.types:
+
+            if name in _type._valid_fields:
+                if _type._valid_fields[name].leaf and not _type._valid_fields[name].list:
+                    raise AttributeError("Optional field '%s' not found in '%s'" % (key,
+                                                                                    self._key))
+
+                self._d[self._key] = _type()
+                self._d[self._key]._d = {}
+
+                if _type._valid_fields[name].list:
+                    return ListDelegate(self._d[self._key]._d, name, _type._valid_fields[name])
+                return AssignDelegate(self._d[self._key]._d, name, _type._valid_fields[name])
+
+        self.__field_error(key)
 
     def __from_raw(self, raw):
         assert not self._field.list
@@ -250,6 +275,9 @@ class AssignDelegate(Delegate):
             except TypeError as e:
                 last_exception = e
         raise last_exception  # pylint: disable=raising-bad-type
+
+    def __field_error(self, key):
+        raise KeyError('"%s" does not have a "%s" field' % (self.__class__.__name__, key))
 
 
 class ListDelegate(Delegate):

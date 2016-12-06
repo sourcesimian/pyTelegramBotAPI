@@ -20,6 +20,30 @@ _update_rsp = """\
  ]}"""
 
 
+from TelegramBotAPI.types.field import Field
+
+class FloatA(Type):
+    a = Field(Float)
+
+class FloatB(Type):
+    b = Field(FloatA)
+
+class FloatC(Type):
+    c = Field(FloatB)
+
+class FloatD(Type):
+    d = Field(FloatC)
+
+class StringA(Type):
+    a = Field(String)
+
+class StringB(Type):
+    b = Field(StringA)
+
+class StringC(Type):
+    c = Field(StringB)
+
+
 class Methods(TestCase):
 
     def test_primitive(self):
@@ -156,22 +180,47 @@ class Methods(TestCase):
         ex['chat']['first_name'] = 'Bar'
         self.assertEquals(ex, m._to_raw())
 
-    def test_deep_nested_assign(self):
-        from TelegramBotAPI.types.field import Field
-        class TypeB(Type):
-            c = Field(Float)
+    def test_nested_deref(self):
+        t = StringB()
+        t.b.a = 'foo'
 
-        class TypeA(Type):
-            b = Field(TypeB)
+        self.assertEqual(3, len(t.b.a))
+        self.assertEqual(True, t.b.a.startswith('foo'))
 
-        class MyType(Type):
-            a = Field(TypeA)
+        t = StringC()
+        t.c.b.a = 'barr'
 
-        m = MyType()
+        self.assertEqual(4, len(t.c.b.a))
+        self.assertEqual(True, t.c.b.a.startswith('barr'))
 
+    def test_deep3_nested_assign(self):
+        m = FloatC()
+        m.c.b.a = 0.1
+
+        ex = {'c': {'b': {'a': 0.1}}}
+        self.assertEqual(ex, m._to_raw())
+
+        self.assertEqual(False, m.c.b.a.is_integer())
+
+        m = FloatC()
         def g():
-            m.a.b.c = 0.1
-        self.assertRaises(NotImplementedError, g)
+            m.x.b.a = 0.1
+        self.assertRaises(KeyError, g)
+
+        def h():
+            m.c.x.a = 0.1
+        self.assertRaises(KeyError, h)
+
+        def i():
+            m.c.b.x = 0.1
+        self.assertRaises(TypeError, i)
+
+    def test_deep4_nested_assign(self):
+        m = FloatD()
+        m.d.c.b.a = 0.1
+
+        ex = {'d': {'c': {'b': {'a': 0.1}}}}
+        self.assertEqual(ex, m._to_raw())
 
     def test_bad_basic_assign(self):
         m = Message()
@@ -252,7 +301,7 @@ class Methods(TestCase):
             return m.date
         self.assertRaises(AttributeError, g)
 
-    def test_nested_deref(self):
+    def test_nested_del(self):
         m = Message()
 
         m.chat.first_name = 'Joe'

@@ -1,6 +1,6 @@
 import logging
 import os
-from io import BufferedReader
+import io
 import asyncio
 import aiohttp
 from aiohttp.helpers import FormData
@@ -25,9 +25,9 @@ class AsyncioClient(BaseClient):
         data = self.__get_post_data(method)
 
         rsp = yield from aiohttp.post(url, data=data, connector=self.__connector)
-        self._check_response_status(rsp.status, url,
-                                    self.__connector.proxy if self.__connector else None,
-                                    lambda: rsp.read())
+        yield from self._check_response_status(rsp.status, url,
+                                               self.__connector.proxy if self.__connector else None,
+                                               rsp.read)
 
         value = yield from rsp.json()
         return self._interpret_response(value, method)
@@ -39,7 +39,7 @@ class AsyncioClient(BaseClient):
 
         use_multipart = False
         for k in list(raw.keys()):
-            if isinstance(raw[k], BufferedReader):
+            if issubclass(raw[k].__class__, io.IOBase):
                 use_multipart = True
                 break
 
@@ -48,9 +48,19 @@ class AsyncioClient(BaseClient):
 
         data = FormData()
         for k in list(raw.keys()):
-            if isinstance(raw[k], BufferedReader):
-                filename = os.path.split(raw[k].name)[1]
-                data.add_field(k, raw[k].read(), filename=filename)
+            if issubclass(raw[k].__class__, io.IOBase):
+                try:
+                    filename = os.path.basename(raw[k].name)
+                except AttributeError:
+                    filename = None
+                data.add_field(k, raw[k], filename=filename)
             else:
                 data.add_field(k, str(raw[k]))
         return data
+
+    @asyncio.coroutine
+    def _check_response_status(self, status, url, proxy, get_body):
+        if status != 200:
+            body = yield from get_body()
+            raise Exception("Server error: %s: %s\n%s\n%s" %
+                            (status, url, proxy, body))

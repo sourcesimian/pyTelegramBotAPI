@@ -1,4 +1,5 @@
 import os
+import io
 from TelegramBotAPI.types.type import Type
 
 
@@ -29,10 +30,18 @@ class Float(Type):
 
 
 class InputFile(Type):
-    def _from_raw(self, filename):
-        if not os.path.isfile(filename):
-            raise TypeError('Not a valid file')
-        self.__filename = filename
+    def _from_raw(self, file):
+        if issubclass(file.__class__, io.IOBase):
+            if not hasattr(file, 'name'):
+                raise ValueError("InputFile as a io.IOBase needs a 'name' attribute: %s" % file)
+        elif not os.path.isfile(file):
+            raise TypeError('Not a valid file: %s' % file)
+        self.__file = file
 
     def _to_raw(self, strict=True):
-        return open(self.__filename, 'rb')
+        if issubclass(self.__file.__class__, io.IOBase):
+            return self.__file
+        return open(self.__file, 'rb')
+
+    def __repr__(self):
+        return "<%s %s>" % (self.__class__.__name__, str(self.__file))
